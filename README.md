@@ -12,8 +12,8 @@ The bot handles:
 - Showing a list of your products to customers.
 - Guiding customers through purchase (including privacy policy acceptance and country checks if needed).
 - Generating unique payment amounts in XDC (or converted from USD).
-- Monitoring the XDC blockchain for payments.
-- Automatically delivering a success message (e.g., an access code or digital product download links) to the customer after payment.
+- Monitoring the XDC blockchain for incoming payments.
+- Automatically delivering a success message (e.g., an access code or digital product download links) to the customer after payment has been received at your address.
 
 Everything runs on your own server (like a cheap VPS), and you control it all. No third-party services required beyond Telegram and a free XDC RPC endpoint.
 
@@ -27,7 +27,7 @@ This repo makes it ultra-simple: Clone it, run a setup script, and you're ready 
 ## Features
 - **Easy Setup:** A script asks for your details and configures everything.
 - **Product Management:** Add/remove products and set delivery messages right from Telegram (only you, the owner, can do this).
-- **Payments:** Customers pay exact amounts to your XDC wallet; bot auto-detects and delivers.
+- **Payments:** Customers pay exact amounts to your XDC wallet; bot auto-detects their payment and delivers.
 - **USD Support:** Price items in USD; bot converts to XDC using real-time rates.
 - **Privacy & Restrictions:** Customizable privacy policy and excluded countries.
 - **Logging:** Keeps records of sales for your records (e.g., taxes).
@@ -37,7 +37,7 @@ This repo makes it ultra-simple: Clone it, run a setup script, and you're ready 
 Before starting, you'll need:
 1. A **VPS (Virtual Private Server)**: Rent a cheap Linux server (e.g., from DigitalOcean, Vultr, or Linode for ~$5/month). It needs Ubuntu or Debian (most common). Make sure you can SSH into it.
 2. **Telegram Account:** For creating the bot and managing it.
-3. **XDC Wallet Address:** Get one from a wallet like XDCPay or MetaMask (set to XDC network). It starts with "xdc...".
+3. **XDC Wallet Address:** Get one from a wallet like XDCPay or MetaMask (set to XDC network). It starts with "xdc..." or "0x...".
 4. **Basic Command-Line Knowledge:** We'll provide exact commands to copy-paste.
 
 If you're new to VPS:
@@ -51,7 +51,7 @@ If you're new to VPS:
 On your VPS, open the terminal (via SSH) and run this command to update your system, install Git and clone the XDC ShopBot to your server:
 
 ```bash
-sudo apt update && sudo apt install git -y && git clone https://github.com/s4njk4n/XDC_ShopBot.git && cd XDC_ShopBot
+sudo apt update && sudo apt install git -y && git clone https://github.com/s4njk4n/XDC_ShopBot.git && cd ~/XDC_ShopBot
 ```
 
 This downloads all the files to a folder called `XDC_ShopBot`.
@@ -76,14 +76,14 @@ This is your personal ID, so only you can manage the bot.
 Back in your VPS terminal (inside the `XDC_ShopBot` folder) we'll now run the setup script:
 
 ```bash
-chmod +x setup.sh && bash ./setup.sh
+cd ~/XDC_ShopBot && chmod +x setup.sh && bash ./setup.sh
 ```
 
 The script will ask questions:
 - Telegram Bot Token: Paste the one from BotFather.
-- Seller XDC Address: Your wallet address (starts with "xdc").
+- Seller XDC Address: Your wallet address (starts with "xdc" or "0x").
 - Your Telegram User ID: The number from @userinfobot.
-- Excluded Countries: Enter comma-separated like "US,CA,RU" or leave blank.
+- Excluded Countries: Enter comma-separated like "Australia, Antarctica" or leave blank.
 - Welcome Title: e.g., "Welcome to My XDC Shop!" (optional, press Enter for default).
 - Privacy Policy: Custom text (optional, press Enter for default).
 
@@ -96,7 +96,7 @@ To run the bot:
 ./start.sh
 ```
 
-This starts two background processes: the bot (handles Telegram messages) and the monitor (checks for payments on XDC blockchain).
+This starts two background processes: the bot (handles Telegram messages) and the monitor (checks for incoming payments on XDC blockchain).
 
 To stop:
 
@@ -114,13 +114,13 @@ To reset logs/states (if something goes wrong):
 
 ### For Customers
 1. They start chatting with your bot on Telegram (share the bot username).
-2. Type `/start`.
+2. Type `/start` (or any random text really).
 3. Accept privacy policy.
-4. If excluded countries set, confirm they're not from there.
+4. If excluded countries set, get the user to confirm they're not from there.
 5. See product list.
 6. Reply with product ID to buy.
 7. Send exact XDC amount to your address (bot gives instructions).
-8. After payment, bot sends success message (e.g., access code or digital product download links).
+8. After payment has been received, bot sends success message (e.g., access code or digital product download links).
 
 ### For You (Admin/Owner)
 Chat with your bot on Telegram. Only your User ID can use these commands:
