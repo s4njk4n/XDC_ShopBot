@@ -1,4 +1,4 @@
-Note: Still under construction. Will remove this message and announce once it is finished
+## Note: Still under construction. Will remove this message and announce once it is finished
 
 # XDC_ShopBot
 
