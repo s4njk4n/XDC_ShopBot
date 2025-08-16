@@ -48,7 +48,7 @@ If you're new to VPS:
 ## Installation
 
 ### Step 1: Clone the Repository
-On your VPS, open the terminal (via SSH) and run these commands to update your system, install Git and clone the repo.
+On your VPS, open the terminal (via SSH) and run this command to update your system, install Git and clone the repo.
 
 ```bash
 sudo apt update && sudo apt install git -y && git clone https://github.com/s4njk4n/XDC_ShopBot.git && cd XDC_ShopBot
@@ -73,14 +73,10 @@ This is your personal ID, so only you can manage the bot.
 3. It will reply with your User ID (a number like `123456789`). Copy it.
 
 ### Step 4: Run the Setup Script
-Back in your VPS terminal (inside the `XDC_ShopBot` folder):
+Back in your VPS terminal (inside the `XDC_ShopBot` folder) we'll now run the setup script:
 
 ```bash
-# Make the script executable
-chmod +x setup.sh
-
-# Run it
-./setup.sh
+chmod +x setup.sh && bash ./setup.sh
 ```
 
 The script will ask questions:
