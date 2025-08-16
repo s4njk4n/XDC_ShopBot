@@ -48,7 +48,7 @@ If you're new to VPS:
 ## Installation
 
 ### Step 1: Clone the Repository
-On your VPS, open the terminal (via SSH) and run this command. It will update your system, install Git and clone the XDC ShopBot to your server:
+Use your terminal application to connect to your VPS via SSH and then run this command on the VPS. It will update your system and copy the XDC ShopBot to your server:
 
 ```bash
 sudo apt update && sudo apt install git -y && git clone https://github.com/s4njk4n/XDC_ShopBot.git && cd ~/XDC_ShopBot
