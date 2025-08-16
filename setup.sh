@@ -1,10 +1,13 @@
 #!/bin/bash
 
 echo "Welcome to the XDC ShopBot setup script."
+echo ""
 echo "This will configure your bot. You'll need your Telegram Bot Token (from BotFather), your XDC seller address, and your Telegram User ID (for admin access)."
+echo ""
 echo "You can find your Telegram User ID by talking to @userinfobot or similar."
 echo ""
-
+echo "####################"
+echo ""
 read -p "Enter Telegram Bot Token: " TELEGRAM_TOKEN
 echo ""
 read -p "Enter Seller XDC Address (starting with 'xdc' or '0x'): " SELLER_ADDRESS
