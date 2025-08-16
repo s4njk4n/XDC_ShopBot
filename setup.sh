@@ -6,13 +6,19 @@ echo "You can find your Telegram User ID by talking to @userinfobot or similar."
 echo ""
 
 read -p "Enter Telegram Bot Token: " TELEGRAM_TOKEN
+echo ""
 read -p "Enter Seller XDC Address (starting with 'xdc' or '0x'): " SELLER_ADDRESS
+echo ""
 read -p "Enter your Telegram User ID (numeric): " OWNER_ID
+echo ""
 read -p "Enter excluded countries (comma-separated, e.g., 'US,CA,RU'; leave empty to skip country check): " EXCLUDED_COUNTRIES
+echo ""
 read -p "Enter welcome title (default: 'Welcome to My XDC Shop!'): " WELCOME_TITLE_INPUT
 WELCOME_TITLE_INPUT=${WELCOME_TITLE_INPUT:-"Welcome to My XDC Shop!"}
+echo ""
 read -p "Enter privacy policy text (default: 'Our privacy policy: We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per our local compliance obligations. No sharing with third parties without consent. Accept? (Yes/No)'): " PRIVACY_POLICY_INPUT
 PRIVACY_POLICY_INPUT=${PRIVACY_POLICY_INPUT:-"Our privacy policy: We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per our local compliance obligations. No sharing with third parties without consent. Accept? (Yes/No)"}
+echo ""
 
 # Normalize SELLER_ADDRESS to 'xdc' prefix
 SELLER_ADDRESS=$(echo "$SELLER_ADDRESS" | tr 'A-F' 'a-f')  # Lowercase hex
