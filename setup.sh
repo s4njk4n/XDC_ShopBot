@@ -92,7 +92,16 @@ EOF
 chmod +x config.sh bot.sh monitor.sh start.sh stop.sh reset.sh
 
 echo ""
+echo "####################"
+echo ""
 echo "Setup complete! Configuration saved to config.sh."
+echo ""
+echo "####################"
+echo ""
 echo "You can now run './start.sh' to start the bot."
+echo ""
 echo "To configure items and messages, use admin commands in Telegram (e.g., /additem, /setmessage) as the owner."
+echo ""
 echo "Run './reset.sh' on the VPS to clear logs and states if needed."
+echo ""
+echo "####################"
