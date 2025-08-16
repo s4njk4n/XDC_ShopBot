@@ -17,7 +17,7 @@ The bot handles:
 
 Everything runs on your own server (like a cheap VPS), and you control it all. No third-party services required beyond Telegram and a free XDC RPC endpoint.
 
-This repo makes it ultra-simple: Clone it, run a setup script, and you're ready to sell!
+I've specifically made it ultra-simple: Clone it, run a setup script, and you're ready to sell!
 
 ## Who is this for?
 - Small business owners, creators, or hobbyists who want to accept XDC payments.
