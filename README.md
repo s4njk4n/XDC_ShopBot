@@ -1,6 +1,6 @@
 # XDC_ShopBot
 
-![XDC ShopBot Logo](https://raw.githubusercontent.com/s4njk4n/XDC_ShopBot/main/XDC_ShopBot.jpg)
+![XDC ShopBot Logo](XDC_ShopBot.jpg)
 
 ## What is XDC_ShopBot?
 
