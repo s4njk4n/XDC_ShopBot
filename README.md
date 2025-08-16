@@ -156,4 +156,4 @@ Fork the repo, make changes, and submit a pull request. Welcome improvements for
 ## License
 MIT License – free to use and modify.
 
-Happy selling with XDC! If you get stuck, ask in XDC communities (Or contact me thru XDC Outpost). 🚀
+Happy selling with XDC! If you get stuck, ask in XDC communities (Or contact me thru [XDC Outpost](https://s4njk4n.github.io/XDCOutpost/)  ). 🚀
