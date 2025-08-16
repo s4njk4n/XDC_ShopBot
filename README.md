@@ -1,3 +1,5 @@
+Note: Still under construction. Will remove this message and announce once it is finished
+
 # XDC_ShopBot
 
 ![XDC ShopBot Logo](XDC_ShopBot.jpg)
