@@ -1,18 +1,26 @@
 #!/bin/bash
 
-echo "Welcome to the XDC Bot setup script."
+echo "Welcome to the XDC ShopBot setup script."
 echo "This will configure your bot. You'll need your Telegram Bot Token (from BotFather), your XDC seller address, and your Telegram User ID (for admin access)."
 echo "You can find your Telegram User ID by talking to @userinfobot or similar."
 echo ""
 
 read -p "Enter Telegram Bot Token: " TELEGRAM_TOKEN
-read -p "Enter Seller XDC Address (starting with 'xdc'): " SELLER_ADDRESS
+read -p "Enter Seller XDC Address (starting with 'xdc' or '0x'): " SELLER_ADDRESS
 read -p "Enter your Telegram User ID (numeric): " OWNER_ID
 read -p "Enter excluded countries (comma-separated, e.g., 'US,CA,RU'; leave empty to skip country check): " EXCLUDED_COUNTRIES
 read -p "Enter welcome title (default: 'Welcome to My XDC Shop!'): " WELCOME_TITLE_INPUT
 WELCOME_TITLE_INPUT=${WELCOME_TITLE_INPUT:-"Welcome to My XDC Shop!"}
-read -p "Enter privacy policy text (default: 'Our privacy policy: We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per ATO obligations. No sharing with third parties without consent. Accept? (Yes/No)'): " PRIVACY_POLICY_INPUT
-PRIVACY_POLICY_INPUT=${PRIVACY_POLICY_INPUT:-"Our privacy policy: We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per ATO obligations. No sharing with third parties without consent. Accept? (Yes/No)"}
+read -p "Enter privacy policy text (default: 'Our privacy policy: We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per our local compliance obligations. No sharing with third parties without consent. Accept? (Yes/No)'): " PRIVACY_POLICY_INPUT
+PRIVACY_POLICY_INPUT=${PRIVACY_POLICY_INPUT:-"Our privacy policy: We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per our local compliance obligations. No sharing with third parties without consent. Accept? (Yes/No)"}
+
+# Normalize SELLER_ADDRESS to 'xdc' prefix
+SELLER_ADDRESS=$(echo "$SELLER_ADDRESS" | tr 'A-F' 'a-f')  # Lowercase hex
+if [[ "$SELLER_ADDRESS" == 0x* ]]; then
+    SELLER_ADDRESS="xdc${SELLER_ADDRESS#0x}"
+elif [[ "$SELLER_ADDRESS" != xdc* ]]; then
+    SELLER_ADDRESS="xdc$SELLER_ADDRESS"
+fi
 
 # Create directories
 mkdir -p messages pending states
@@ -49,7 +57,7 @@ OWNER_ID="$OWNER_ID"
 # RPC URL for XDC network (use a public one or your own node)
 RPC_URL="https://rpc.ankr.com/xdc"
 
-# CoinGecko-like API for USD to XDC conversion (free, no key needed)
+# Bitrue API for USD to XDC conversion
 PRICE_API="https://openapi.bitrue.com/api/v1/ticker/price?symbol=XDCUSDT"
 
 # Items CSV path
@@ -87,4 +95,4 @@ echo ""
 echo "Setup complete! Configuration saved to config.sh."
 echo "You can now run './start.sh' to start the bot."
 echo "To configure items and messages, use admin commands in Telegram (e.g., /additem, /setmessage) as the owner."
-echo "Run './reset.sh' to clear logs and states if needed."
+echo "Run './reset.sh' on the VPS to clear logs and states if needed."
