@@ -156,7 +156,7 @@ Sales logged in `success_log.csv` for your records.
 - Questions? Open an issue on GitHub.
 
 ## Security Notes
-- Keep your token and address private.
+- Keep your bot token and address private.
 - Run on a secure VPS with firewall (e.g., `ufw allow ssh; ufw enable`).
 - Bot uses flock for concurrency, but for high traffic, consider upgrades.
 
@@ -166,4 +166,4 @@ Fork the repo, make changes, and submit a pull request. Welcome improvements for
 ## License
 MIT License – free to use and modify.
 
-Happy selling with XDC! If you get stuck, search "how to [step]" on Google or ask in XDC communities. 🚀
+Happy selling with XDC! If you get stuck, search "how to [step]" on Google or ask in XDC communities (Or contact me thru XDC Outpost). 🚀
