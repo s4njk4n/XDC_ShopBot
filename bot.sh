@@ -85,7 +85,7 @@ while true; do
 
         log_event "Raw text received from $user_id: $raw_text"
 
-        # Handle /start reset at any time to restart the conversation.
+        # Handle /start reset at any point (using raw_text)
         if [[ "${raw_text,,}" == "/start" ]]; then
             # Clear pending if exists
             pending_file="$PENDING_DIR/$user_id.pending"
@@ -301,7 +301,7 @@ while true; do
                 ;;
             admin:add_item_name:*)
                 name="$raw_text"
-                id="${current_state#*:}"
+                id="${current_state#admin:add_item_name:}"
                 if [[ "$name" == *","* ]]; then
                     send_message "$chat_id" "Name cannot contain commas. Try again or /cancel."
                 else
@@ -311,7 +311,7 @@ while true; do
                 ;;
             admin:add_item_price:*)
                 price="$raw_text"
-                params="${current_state#*:}"
+                params="${current_state#admin:add_item_price:}"
                 id="${params%%:*}"
                 name="${params#*:}"
                 if ! echo "$price" | grep -qE '^[0-9]+(\.[0-9]+)?$'; then
@@ -323,7 +323,7 @@ while true; do
                 ;;
             admin:add_item_currency:*)
                 currency="${raw_text^^}"
-                params="${current_state#*:}"
+                params="${current_state#admin:add_item_currency:}"
                 id="${params%%:*}"
                 params="${params#*:}"
                 name="${params%%:*}"
@@ -338,7 +338,7 @@ while true; do
                 ;;
             admin:set_message_text:*)
                 text="$raw_text"
-                id="${current_state#*:}"
+                id="${current_state#admin:set_message_text:}"
                 echo "$text" > "$MESSAGES_DIR/$id.txt"
                 send_message "$chat_id" "Success message set for item $id."
                 set_state "$user_id" "state:start"
