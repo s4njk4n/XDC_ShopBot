@@ -25,7 +25,7 @@ send_html_message() {
     local text="$2"
     curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
          -d chat_id="$chat_id" -d text="$text" -d parse_mode="HTML" > /dev/null
-    log_event "Sent HTML to $chat_id: $text"
+    log_event "Sent HTML to $chat_id: $text (raw: $text)"
 }
 
 # Function to get or set user state (with flock for concurrency)
@@ -55,7 +55,7 @@ set_state() {
 
 # Function to sanitize user input (prevent injection; alphanum + basic chars)
 sanitize_input() {
-    echo "$1" | sed 's/[^a-zA-Z0-9 .,_\-:/!]//g'  # Allow more for admin, but remove dangerous; allow : for state
+    echo "$1" | sed 's/[^a-zA-Z0-9 .,:_/!\-]//g'  # Moved - to the end
 }
 
 # Function to escape HTML special chars
@@ -83,6 +83,8 @@ while true; do
         user_id=$(echo "$message" | jq '.from.id')
         raw_text=$(echo "$update" | jq -r '.message.text')  # Raw for commands
 
+        log_event "Raw text received from $user_id: $raw_text"
+
         # Handle /start reset at any point (using raw_text)
         if [[ "${raw_text,,}" == "/start" ]]; then
             # Clear pending if exists
@@ -99,12 +101,14 @@ while true; do
 
         text=$(sanitize_input "$raw_text")
 
+        log_event "Sanitized text: $text"
+
         if [ -z "$text" ] || [ "$text" = "null" ]; then
             send_message "$chat_id" "Please respond with text (Yes/No)."
             continue
         fi
 
-        current_state=$(get_state "$user_id" | grep '^state:' | cut -d: -f2-)
+        current_state=$(get_state "$user_id")
 
         # Handle /cancel in admin states
         if [[ "${raw_text,,}" == "/cancel" ]] && [[ "$current_state" == admin* ]]; then
@@ -142,7 +146,8 @@ while true; do
                 if [ -z "$items_list" ]; then
                     send_message "$chat_id" "No items available."
                 else
-                    send_html_message "$chat_id" "Current items:\n$items_list"
+                    full_message=$'Current items:\n'"$items_list"
+                    send_html_message "$chat_id" "$full_message"
                 fi
                 continue
             elif [[ "$raw_text" == "/setwelcometitle" ]]; then
@@ -162,14 +167,14 @@ while true; do
 
         # State machine
         case "$current_state" in
-            start)
+            state:start)
                 WELCOME_TITLE=$(cat welcome_title.txt)
                 PRIVACY_POLICY=$(cat privacy_policy.txt)
                 welcome_message=$(printf '<b>%s</b>\n\nYou can type /start at any time to restart the conversation.\n\n%s' "$WELCOME_TITLE" "$PRIVACY_POLICY")
                 send_html_message "$chat_id" "$welcome_message"
                 set_state "$user_id" "state:await_policy"
                 ;;
-            await_policy)
+            state:await_policy)
                 text_lower="${text,,}"
 
                 if [ "$text_lower" = "yes" ]; then
@@ -183,9 +188,9 @@ while true; do
                         }' "$ITEMS_CSV")
 
                         if [ -z "$items_list" ]; then
-                            full_message="No items currently available. Check back later!"
+                            full_message=$'No items currently available. Check back later!'
                         else
-                            full_message="Available items:\n$items_list\n\nReply with the ID number (e.g., '1') to select and purchase an item."
+                            full_message=$'Available items:\n'"$items_list"$'\n\nReply with the ID number (e.g., \'1\') to select and purchase an item.'
                         fi
 
                         send_html_message "$chat_id" "$full_message"
@@ -202,7 +207,7 @@ while true; do
                     send_message "$chat_id" "Please reply with 'Yes' to accept or 'No' to decline the privacy policy."
                 fi
                 ;;
-            await_country_check)
+            state:await_country_check)
                 text_lower="${text,,}"
                 if [ "$text_lower" = "yes" ]; then
                     send_message "$chat_id" "Sorry, we cannot serve residents of those countries. Goodbye."
@@ -215,9 +220,9 @@ while true; do
                     }' "$ITEMS_CSV")
 
                     if [ -z "$items_list" ]; then
-                        full_message="No items currently available. Check back later!"
+                        full_message=$'No items currently available. Check back later!'
                     else
-                        full_message="Available items:\n$items_list\n\nReply with the ID number (e.g., '1') to select and purchase an item."
+                        full_message=$'Available items:\n\n'"$items_list"$'\n\nReply with the ID number (e.g., \'1\') to select and purchase an item.'
                     fi
 
                     send_html_message "$chat_id" "$full_message"
@@ -226,7 +231,7 @@ while true; do
                     send_message "$chat_id" "Please reply with 'Yes' or 'No'."
                 fi
                 ;;
-            select_item)
+            state:select_item)
                 item_id=$(sanitize_input "$text")
                 item=$(grep "^$item_id," "$ITEMS_CSV")
                 if [ -z "$item" ]; then
@@ -274,7 +279,7 @@ while true; do
                 send_message "$chat_id" "Send exactly $expected_amount XDC to $SELLER_ADDRESS (or $o_address if your wallet requires 0x). You have 10 minutes."
                 set_state "$user_id" "state:await_payment"
                 ;;
-            await_payment)
+            state:await_payment)
                 send_message "$chat_id" "Payment pending. Wait for confirmation."
                 ;;
             admin:add_item_id)
@@ -288,7 +293,7 @@ while true; do
                 ;;
             admin:add_item_name:*)
                 name="$raw_text"
-                id="${current_state#*:}"
+                id="${current_state#admin:add_item_name:}"
                 if [[ "$name" == *","* ]]; then
                     send_message "$chat_id" "Name cannot contain commas. Try again or /cancel."
                 else
@@ -298,7 +303,7 @@ while true; do
                 ;;
             admin:add_item_price:*)
                 price="$raw_text"
-                params="${current_state#*:}"
+                params="${current_state#admin:add_item_price:}"
                 id="${params%%:*}"
                 name="${params#*:}"
                 if ! echo "$price" | grep -qE '^[0-9]+(\.[0-9]+)?$'; then
@@ -310,7 +315,7 @@ while true; do
                 ;;
             admin:add_item_currency:*)
                 currency="${raw_text^^}"
-                params="${current_state#*:}"
+                params="${current_state#admin:add_item_currency:}"
                 id="${params%%:*}"
                 params="${params#*:}"
                 name="${params%%:*}"
@@ -324,7 +329,7 @@ while true; do
                 ;;
             admin:add_item_basename:*)
                 basename="$raw_text"
-                params="${current_state#*:}"
+                params="${current_state#admin:add_item_basename:}"
                 id="${params%%:*}"
                 params="${params#*:}"
                 name="${params%%:*}"
@@ -342,7 +347,7 @@ while true; do
                 ;;
             admin:set_message_text:*)
                 text="$raw_text"
-                basename="${current_state#*:}"
+                basename="${current_state#admin:set_message_text:}"
                 echo "$text" > "$MESSAGES_DIR/$basename.txt"
                 send_message "$chat_id" "Success message set for $basename."
                 set_state "$user_id" "state:start"
