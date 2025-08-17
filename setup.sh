@@ -50,7 +50,7 @@ echo "2,Service B,20,USD" >> items.csv
 
 # Example messages
 echo "Thanks for buying Product A! Your access code is XYZ." > messages/1.txt
-echo "Thanks for buying Product B! Your access code is XYZ." > messages/2.txt
+echo "Thanks for buying Service B! Youraccess code is XYZ." > messages/2.txt
 
 # Generate config.sh
 cat > config.sh <<EOF
@@ -67,9 +67,6 @@ OWNER_ID="$OWNER_ID"
 
 # RPC URL for XDC network (use a public one or your own node)
 RPC_URL="https://rpc.ankr.com/xdc"
-
-# Bitrue API for USD to XDC conversion
-PRICE_API="https://openapi.bitrue.com/api/v1/ticker/price?symbol=XDCUSDT"
 
 # Items CSV path
 ITEMS_CSV="items.csv"
