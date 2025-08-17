@@ -64,7 +64,7 @@ You need a Telegram bot token. This is like a password for your bot.
 1. Open Telegram on your phone or desktop.
 2. Search for `@BotFather` (official Telegram bot creator).
 3. Start a chat and type `/newbot`.
-4. Follow prompts: Give your bot a name (e.g., "MyXDCSHopBot") and username (ends with "bot", e.g., "my_xdc_shop_bot").
+4. Follow prompts: Give your bot a name (e.g., "MyXDCShopBot") and username (ends with "bot", e.g., "my_xdc_shop_bot").
 5. BotFather will give you a **token** like `123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11`. Copy it safely.
 
 ### Step 3: Get Your Telegram User ID
