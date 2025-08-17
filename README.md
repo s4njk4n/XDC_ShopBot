@@ -1,4 +1,4 @@
-## Note: Still under construction. Will remove this message and announce once it is finished
+Experimental project released under MIT license. Feel free to build or improve further.
 
 # XDC_ShopBot
 
@@ -17,7 +17,7 @@ The bot handles:
 
 Everything runs on your own server (like a cheap VPS), and you control it all. No third-party services required beyond Telegram and a free XDC RPC endpoint.
 
-I've specifically made it ultra-simple: Clone it, run a setup script, and you're ready to sell!
+I've specifically made it ultra-simple: Clone it, run a setup script, and you're ready to sell.
 
 **Important Disclaimer:** This project is provided "as is" under the MIT License. The author makes no warranties, and you use it at your own risk. Always test thoroughly, comply with local laws, and consider consulting a professional for payment systems. Cryptocurrency transactions are irreversible—handle with care.
 
@@ -32,7 +32,7 @@ I've specifically made it ultra-simple: Clone it, run a setup script, and you're
 - **Payments:** Customers pay exact amounts to your XDC wallet; bot auto-detects their payment and delivers.
 - **USD Support:** Price items in USD; bot converts to XDC using real-time rates.
 - **Privacy & Restrictions:** Customizable privacy policy and excluded countries.
-- **Logging:** Keeps basic records of sales for your records (e.g., compliance).
+- **Logging:** Keeps basic records of sales for your records (e.g., compliance) - This part needs further developemnt.
 - **Secure:** Runs on your server; no sharing sensitive data.
 
 ## Prerequisites
