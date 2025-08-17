@@ -6,7 +6,7 @@
 
 ## What is XDC_ShopBot?
 
-XDC_ShopBot is a simple, beginner-friendly Telegram bot that lets you sell digital products (like access codes, files, or services) and accept payments in XDC cryptocurrency. It's designed for anyone who wants to set up an online shop without needing advanced coding skills. 
+XDC_ShopBot is a simple, beginner-friendly Telegram bot that lets you sell digital products (like access codes, files, or services) and accept payments in XDC cryptocurrency. It's designed for hobbyists wanting to set up or play with an online shop without needing advanced coding skills. 
 
 The bot handles:
 - Showing a list of your products to customers.
@@ -19,8 +19,10 @@ Everything runs on your own server (like a cheap VPS), and you control it all. N
 
 I've specifically made it ultra-simple: Clone it, run a setup script, and you're ready to sell!
 
+**Important Disclaimer:** This project is provided "as is" under the MIT License. The author makes no warranties, and you use it at your own risk. Always test thoroughly, comply with local laws, and consider consulting a professional for payment systems. Cryptocurrency transactions are irreversible—handle with care.
+
 ## Who is this for?
-- Small business owners, creators, or hobbyists who want to accept XDC payments.
+- Hobbyists who want to accept XDC payments.
 - People with basic computer skills – we'll guide you step-by-step.
 - No coding needed after setup; manage products via Telegram commands.
 
@@ -30,7 +32,7 @@ I've specifically made it ultra-simple: Clone it, run a setup script, and you're
 - **Payments:** Customers pay exact amounts to your XDC wallet; bot auto-detects their payment and delivers.
 - **USD Support:** Price items in USD; bot converts to XDC using real-time rates.
 - **Privacy & Restrictions:** Customizable privacy policy and excluded countries.
-- **Logging:** Keeps records of sales for your records (e.g., taxes).
+- **Logging:** Keeps basic records of sales for your records (e.g., compliance).
 - **Secure:** Runs on your server; no sharing sensitive data.
 
 ## Prerequisites
@@ -42,7 +44,7 @@ Before starting, you'll need:
 
 If you're new to VPS:
 - Sign up for a provider.
-- Create a server (choose Ubuntu 22.04 or similar).
+- Create a server (choose Ubuntu 24.04 or similar).
 - SSH in: On Windows, use PuTTY; on Mac/Linux, use terminal with `ssh user@ip-address`.
 
 ## Installation
@@ -51,7 +53,7 @@ If you're new to VPS:
 Use your terminal application to connect to your VPS via SSH and then run this command on the VPS. It will update your system and copy the XDC ShopBot to your server:
 
 ```bash
-sudo apt update && sudo apt install git -y && git clone https://github.com/s4njk4n/XDC_ShopBot.git && cd ~/XDC_ShopBot
+sudo apt update -y && sudo apt install git bash curl jq bc -y && sudo apt autoremove -y && git clone https://github.com/s4njk4n/XDC_ShopBot.git && cd ~/XDC_ShopBot
 ```
 
 This downloads all the files to a folder called `XDC_ShopBot`.
@@ -123,35 +125,30 @@ To reset logs/states (if something goes wrong):
 8. After payment has been received, bot sends success message (e.g., access code or digital product download links).
 
 ### For You (Admin/Owner)
-Chat with your bot on Telegram. Only your User ID can use these commands:
+Chat with your bot on Telegram. Only your User ID can use the special `/admin` command to open the Admin menu through which you can:
 
-- `/additem`: Add a new product (follow prompts for ID, name, price, currency, message basename).
-- `/delitem <ID>`: Delete a product (e.g., `/delitem 1`).
-- `/setmessage`: Set/update a success message for a product (prompts for basename and text).
-- `/listitems`: Show current products.
-- `/setwelcometitle`: Change the welcome message title.
-- `/setpolicy`: Update the privacy policy text.
-- `/setexcluded`: Change excluded countries.
-
-Example: Adding an item guides you step-by-step in chat.
+1. List all items (shows IDs, names, prices, and success messages).
+2. Add an item (prompts for ID, name, currency (XDC/USD), price, and success message).
+3. Delete an item (by ID).
+4. Set new success message (for an existing item ID).
+5. Set new welcome title.
+6. Set new privacy policy.
+7. Set excluded countries (comma-separated or "none").
+0. Exit admin menu.
 
 Products are stored in `items.csv` (but edit via commands to avoid mistakes). Success messages in `messages/` folder as `.txt` files.
 
 Sales logged in `success_log.csv` for your records.
 
 ## Troubleshooting
-- Bot not responding? Check `bot_output.log` and `monitor_output.log` for errors.
+- Bot not responding? Check `bot_output.log`, `monitor_output.log` and `bot_log.txt` for errors.
 - Payment not detecting? Ensure your RPC_URL in `config.sh` works (default is public).
-- Need to change config? Edit `config.sh` manually or re-run `setup.sh`.
-- Questions? Open an issue on GitHub.
+- Need to change config? Edit `config.sh` manually or re-run `setup.sh`. This will be refined further as we go along.
 
 ## Security Notes
-- Keep your bot token and address private.
+- Keep your bot token private.
 - Run on a secure VPS with firewall (e.g., `ufw allow ssh; ufw enable`).
-- Bot uses flock for concurrency, but for high traffic, consider upgrades.
-
-## Contributing
-Fork the repo, make changes, and submit a pull request. Welcome improvements for beginners!
+- Bot uses flock for concurrency
 
 ## License
 MIT License – free to use and modify.
