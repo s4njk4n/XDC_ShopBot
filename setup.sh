@@ -45,8 +45,8 @@ touch success_log.csv
 echo "timestamp,user_id,item_id,amount_xdc,tx_hash" > success_log.csv
 
 # Example items (optional; user can add via bot)
-echo "1,Product A,1,XDC" >> items.csv
-echo "2,Service B,2,USD" >> items.csv
+echo "1,Product A,100,XDC" >> items.csv
+echo "2,Service B,20,USD" >> items.csv
 
 # Example messages
 echo "Thanks for buying Product A! Your access code is XYZ." > messages/1.txt
