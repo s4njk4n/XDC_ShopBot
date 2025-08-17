@@ -213,9 +213,23 @@ while true; do
                 currency=$(echo "$item" | cut -d, -f4)
 
                 if [ "$currency" = "USD" ]; then
-                    xdc_usd=$(curl -s "$PRICE_API" | jq -r '.price')
-                    if [ -z "$xdc_usd" ] || [ "$xdc_usd" = "null" ] || ! echo "$xdc_usd" | grep -qE '^[0-9]+\.[0-9]+$'; then
-                        send_message "$chat_id" "Price fetch failed. Please try again later."
+                    xdc_usd=""
+                    for api in \
+                        'https://openapi.bitrue.com/api/v1/ticker/price?symbol=XDCUSDT|.price' \
+                        'https://min-api.cryptocompare.com/data/price?fsym=XDC&tsyms=USDT|.USDT' \
+                        'https://api-cloud.bitmart.com/spot/v1/ticker?symbol=XDC_USDT|.data.tickers[0].last_price' \
+                    ; do
+                        url="${api%%|*}"
+                        jq_path="${api##*|}"
+                        fetched_price=$(curl -s "$url" | jq -r "$jq_path" 2>/dev/null)
+                        if [ -n "$fetched_price" ] && echo "$fetched_price" | grep -qE '^[0-9]+\.[0-9]+$' ; then
+                            xdc_usd="$fetched_price"
+                            break
+                        fi
+                    done
+
+                    if [ -z "$xdc_usd" ] || [ "$xdc_usd" = "null" ]; then
+                        send_message "$chat_id" "Price fetch failed from all sources. Please try again later."
                         continue
                     fi
                     xdc_amount=$(echo "scale=5; $price / $xdc_usd" | bc)
