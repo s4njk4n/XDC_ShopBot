@@ -85,7 +85,7 @@ while true; do
 
         log_event "Raw text received from $user_id: $raw_text"
 
-        # Handle /start reset at any point (using raw_text)
+        # Handle /start reset at any time to restart the conversation.
         if [[ "${raw_text,,}" == "/start" ]]; then
             # Clear pending if exists
             pending_file="$PENDING_DIR/$user_id.pending"
@@ -128,14 +128,21 @@ while true; do
                 id=$(sanitize_input "$id")
                 if grep -q "^$id," "$ITEMS_CSV"; then
                     sed -i "/^$id,/d" "$ITEMS_CSV"
+                    rm -f "$MESSAGES_DIR/$id.txt"  # Delete success message file if exists
                     send_message "$chat_id" "Item $id deleted."
                 else
                     send_message "$chat_id" "Item $id not found."
                 fi
                 continue
-            elif [[ "$raw_text" == "/setmessage" ]]; then
-                send_message "$chat_id" "Enter the message basename (e.g., product_a_success):"
-                set_state "$user_id" "admin:set_message_basename"
+            elif [[ "$raw_text" == "/setmessage "* ]]; then
+                id="${raw_text#/setmessage }"
+                id=$(sanitize_input "$id")
+                if grep -q "^$id," "$ITEMS_CSV"; then
+                    send_message "$chat_id" "Enter the success message text for item $id (multi-line OK):"
+                    set_state "$user_id" "admin:set_message_text:$id"
+                else
+                    send_message "$chat_id" "Item $id not found."
+                fi
                 continue
             elif [[ "$raw_text" == "/listitems" ]]; then
                 items_list=$(awk -F, 'NR>1 && $1 ~ /^[0-9]+$/ {
@@ -276,7 +283,8 @@ while true; do
 
                 # Payment instructions
                 o_address="0x${SELLER_ADDRESS#xdc}"
-                send_message "$chat_id" "Send exactly $expected_amount XDC to $SELLER_ADDRESS (or $o_address if your wallet requires 0x). You have 10 minutes."
+                payment_message=$'Send exactly '"$expected_amount"$' XDC to:\n\n'"$SELLER_ADDRESS"$'\n\n(or '"$o_address"$' if your wallet requires the 0x prefix).\n\nYou have 10 minutes to make payment after which your cart will be reset. Once you have made payment, please allow 30-60 seconds to receive confirmation that we have received it. You will be presented with product information after your transfer has been received.'
+                send_html_message "$chat_id" "$payment_message"
                 set_state "$user_id" "state:await_payment"
                 ;;
             state:await_payment)
@@ -293,7 +301,7 @@ while true; do
                 ;;
             admin:add_item_name:*)
                 name="$raw_text"
-                id="${current_state#admin:add_item_name:}"
+                id="${current_state#*:}"
                 if [[ "$name" == *","* ]]; then
                     send_message "$chat_id" "Name cannot contain commas. Try again or /cancel."
                 else
@@ -303,7 +311,7 @@ while true; do
                 ;;
             admin:add_item_price:*)
                 price="$raw_text"
-                params="${current_state#admin:add_item_price:}"
+                params="${current_state#*:}"
                 id="${params%%:*}"
                 name="${params#*:}"
                 if ! echo "$price" | grep -qE '^[0-9]+(\.[0-9]+)?$'; then
@@ -315,7 +323,7 @@ while true; do
                 ;;
             admin:add_item_currency:*)
                 currency="${raw_text^^}"
-                params="${current_state#admin:add_item_currency:}"
+                params="${current_state#*:}"
                 id="${params%%:*}"
                 params="${params#*:}"
                 name="${params%%:*}"
@@ -323,33 +331,16 @@ while true; do
                 if [ "$currency" != "XDC" ] && [ "$currency" != "USD" ]; then
                     send_message "$chat_id" "Invalid currency. Try again or /cancel."
                 else
-                    send_message "$chat_id" "Enter message basename (e.g., product_c_success):"
-                    set_state "$user_id" "admin:add_item_basename:$id:$name:$price:$currency"
+                    echo "$id,$name,$price,$currency" >> "$ITEMS_CSV"
+                    send_message "$chat_id" "Item added: ID $id - $name - $price $currency. Use /setmessage $id to set the success message."
+                    set_state "$user_id" "state:start"
                 fi
-                ;;
-            admin:add_item_basename:*)
-                basename="$raw_text"
-                params="${current_state#admin:add_item_basename:}"
-                id="${params%%:*}"
-                params="${params#*:}"
-                name="${params%%:*}"
-                params="${params#*:}"
-                price="${params%%:*}"
-                currency="${params#*:}"
-                echo "$id,$name,$price,$currency,$basename" >> "$ITEMS_CSV"
-                send_message "$chat_id" "Item added: ID $id - $name - $price $currency ($basename)"
-                set_state "$user_id" "state:start"
-                ;;
-            admin:set_message_basename)
-                basename="$raw_text"
-                send_message "$chat_id" "Enter the success message text (multi-line OK):"
-                set_state "$user_id" "admin:set_message_text:$basename"
                 ;;
             admin:set_message_text:*)
                 text="$raw_text"
-                basename="${current_state#admin:set_message_text:}"
-                echo "$text" > "$MESSAGES_DIR/$basename.txt"
-                send_message "$chat_id" "Success message set for $basename."
+                id="${current_state#*:}"
+                echo "$text" > "$MESSAGES_DIR/$id.txt"
+                send_message "$chat_id" "Success message set for item $id."
                 set_state "$user_id" "state:start"
                 ;;
             admin:set_welcome_title)
