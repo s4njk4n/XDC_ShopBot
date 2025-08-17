@@ -128,8 +128,7 @@ while true; do
                 fi
 
                 if [ "$value_dec" = "$expected_wei" ]; then
-                    message_basename=$(grep "^$item_id," "$ITEMS_CSV" | cut -d, -f5)
-                    success_msg=$(cat "$MESSAGES_DIR/$message_basename.txt")
+                    success_msg=$(cat "$MESSAGES_DIR/$item_id.txt")
                     send_message "$user_id" "$success_msg"
                     set_state "$user_id" "state:start"
 
