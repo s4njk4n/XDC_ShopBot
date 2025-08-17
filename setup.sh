@@ -21,8 +21,8 @@ echo ""
 read -p "Enter welcome title (default: 'Welcome to My XDC Shop!'): " WELCOME_TITLE_INPUT
 WELCOME_TITLE_INPUT=${WELCOME_TITLE_INPUT:-"Welcome to My XDC Shop!"}
 echo ""
-read -p "Enter privacy policy text (default: 'Our privacy policy: We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per our local compliance obligations. No sharing with third parties without consent. Accept? (Yes/No)'): " PRIVACY_POLICY_INPUT
-PRIVACY_POLICY_INPUT=${PRIVACY_POLICY_INPUT:-"Our privacy policy: We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per our local compliance obligations. No sharing with third parties without consent. Accept? (Yes/No)"}
+read -p "Enter privacy policy text (default: 'We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per our local compliance obligations. No sharing with third parties without consent.'): " PRIVACY_POLICY_INPUT
+PRIVACY_POLICY_INPUT=${PRIVACY_POLICY_INPUT:-"We collect minimal data (Telegram user ID, purchase details) for legal compliance. Data is retained for 7 years per our local compliance obligations. No sharing with third parties without consent."}
 echo ""
 
 # Normalize SELLER_ADDRESS to 'xdc' prefix
