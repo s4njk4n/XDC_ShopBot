@@ -37,7 +37,7 @@ fi
 mkdir -p messages pending states
 
 # Initialize files
-echo "id,name,price,currency,message_basename" > items.csv
+echo "id,name,price,currency" > items.csv
 echo "$EXCLUDED_COUNTRIES" > excluded_countries.txt
 echo "$WELCOME_TITLE_INPUT" > welcome_title.txt
 echo "$PRIVACY_POLICY_INPUT" > privacy_policy.txt
@@ -45,12 +45,12 @@ touch success_log.csv
 echo "timestamp,user_id,item_id,amount_xdc,tx_hash" > success_log.csv
 
 # Example items (optional; user can add via bot)
-echo "1,Product A,1,XDC,product_a_success" >> items.csv
-echo "2,Service B,2,USD,service_b_success" >> items.csv
+echo "1,Product A,1,XDC" >> items.csv
+echo "2,Service B,2,USD" >> items.csv
 
 # Example messages
-echo "Thanks for buying Product A! Your access code is XYZ." > messages/product_a_success.txt
-echo "Thanks for buying Product B! Your access code is XYZ." > messages/service_b_success.txt
+echo "Thanks for buying Product A! Your access code is XYZ." > messages/1.txt
+echo "Thanks for buying Product B! Your access code is XYZ." > messages/2.txt
 
 # Generate config.sh
 cat > config.sh <<EOF
