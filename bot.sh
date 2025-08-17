@@ -67,7 +67,7 @@ escape_html() {
 send_admin_menu() {
     local chat_id=$1
     local user_id=$2
-    local menu_text="<b>Available Admin Actions:</b>"$'\n\n'"1. List all available items"$'\n'"2. Add an item"$'\n'"3. Delete an item"$'\n'"4. Set success message for an item"$'\n'"5. Set welcome title"$'\n'"6. Set privacy policy"$'\n'"7. Set excluded countries"$'\n'"0. Exit"
+    local menu_text="<b>Available Admin Actions:</b>"$'\n\n'"1. List all available items"$'\n'"2. Add an item"$'\n'"3. Delete an item"$'\n'"4. Set new success message for an item"$'\n'"5. Set new welcome title"$'\n'"6. Set new privacy policy"$'\n'"7. Set excluded countries"$'\n'"0. Exit"
     send_html_message "$chat_id" "$menu_text"
     set_state "$user_id" "admin:menu"
 }
@@ -103,7 +103,7 @@ while true; do
             # Send welcome message immediately
             WELCOME_TITLE=$(cat welcome_title.txt)
             PRIVACY_POLICY=$(cat privacy_policy.txt)
-            welcome_message=$(printf '<b>%s</b>\n\nYou can type /start at any time to restart the conversation.\n\nOur privacy policy:\n\n %s\n\nAccept? (Yes/No)' "$WELCOME_TITLE" "$PRIVACY_POLICY")
+            welcome_message=$(printf '<b>%s</b>\n\nYou can type /start at any time to restart the conversation.\n\nOur privacy policy:\n\n%s\n\nAccept? (Yes/No)' "$WELCOME_TITLE" "$PRIVACY_POLICY")
             send_html_message "$chat_id" "$welcome_message"
             set_state "$user_id" "state:await_policy"
             continue  # Skip to next update
@@ -140,7 +140,7 @@ while true; do
             state:start)
                 WELCOME_TITLE=$(cat welcome_title.txt)
                 PRIVACY_POLICY=$(cat privacy_policy.txt)
-                welcome_message=$(printf '<b>%s</b>\n\nYou can type /start at any time to restart the conversation.\n\nOur privacy policy: %s\n\nAccept? (Yes/No)' "$WELCOME_TITLE" "$PRIVACY_POLICY")
+                welcome_message=$(printf '<b>%s</b>\n\nYou can type /start at any time to restart the conversation.\n\nOur privacy policy:\n\n%s\n\nAccept? (Yes/No)' "$WELCOME_TITLE" "$PRIVACY_POLICY")
                 send_html_message "$chat_id" "$welcome_message"
                 set_state "$user_id" "state:await_policy"
                 ;;
@@ -160,7 +160,7 @@ while true; do
                         if [ -z "$items_list" ]; then
                             full_message=$'No items currently available. Check back later!'
                         else
-                            full_message=$'<b>Available items:</b>\n'"$items_list"$'\n\nReply with the ID number (e.g., \'1\') to select and purchase an item.'
+                            full_message=$'<b>Available items:</b>\n'"$items_list"$'\n\nNote: Prices shown are the base cost. For security and order tracking, your exact payment amount will be a unique value slightly less than this (e.g., 0.XX instead of 1.00). You\'ll get precise instructions after selecting.\n\nReply with the ID number (e.g., \'1\') to select and purchase an item.'
                         fi
 
                         send_html_message "$chat_id" "$full_message"
@@ -192,7 +192,7 @@ while true; do
                     if [ -z "$items_list" ]; then
                         full_message=$'No items currently available. Check back later!'
                     else
-                        full_message=$'<b>Available items:</b>\n\n'"$items_list"$'\n\nReply with the ID number (e.g., \'1\') to select and purchase an item.'
+                        full_message=$'<b>Available items:</b>\n\n'"$items_list"$'\n\nNote: Prices shown are the base cost. For security and order tracking, your exact payment amount will be a unique value slightly less than this (e.g., 0.XX instead of 1.00). You\'ll get precise instructions after selecting.\n\nReply with the ID number (e.g., \'1\') to select and purchase an item.'
                     fi
 
                     send_html_message "$chat_id" "$full_message"
@@ -246,8 +246,12 @@ while true; do
 
                 # Payment instructions
                 o_address="0x${SELLER_ADDRESS#xdc}"
-                payment_message=$'Send exactly '"$expected_amount"$' XDC to:\n\n'"$SELLER_ADDRESS"$'\n\n(or '"$o_address"$' if your wallet requires the 0x prefix).\n\nYou have 10 minutes to make payment after which your cart will be reset. Once you have made payment, please allow 30-60 seconds to receive confirmation that we have received it. You will be presented with product information after your transfer has been received.'
+
+                payment_message="<b>IMPORTANT: Send EXACTLY $expected_amount XDC</b> to:"$'\n\n'"$SELLER_ADDRESS"$'\n\n'"(or $o_address if your wallet requires the 0x prefix)."$'\n\n'"This unique amount identifies your specific order—do not send the base price of $price $currency or any other amount, as it will not be detected and your payment may be lost."$'\n\n'"You have 10 minutes to make payment, after which your cart will be reset. Once sent, allow 30-60 seconds for confirmation. You will receive product details automatically after we detect it."
+                
                 send_html_message "$chat_id" "$payment_message"
+                
+
                 set_state "$user_id" "state:await_payment"
                 ;;
             state:await_payment)
@@ -304,7 +308,7 @@ while true; do
                         set_state "$user_id" "admin:set_policy"
                         ;;
                     7)
-                        send_message "$chat_id" "Enter excluded countries (comma-separated, empty for none):"
+                        send_message "$chat_id" "Enter excluded countries (comma-separated) or type 'none' for no exclusions:"
                         set_state "$user_id" "admin:set_excluded"
                         ;;
                     0)
@@ -315,7 +319,7 @@ while true; do
                         # Send welcome message immediately
                         WELCOME_TITLE=$(cat welcome_title.txt)
                         PRIVACY_POLICY=$(cat privacy_policy.txt)
-                        welcome_message=$(printf '<b>%s</b>\n\nYou can type /start at any time to restart the conversation.\n\nOur privacy policy:\n\n %s\n\nAccept? (Yes/No)' "$WELCOME_TITLE" "$PRIVACY_POLICY")
+                        welcome_message=$(printf '<b>%s</b>\n\nYou can type /start at any time to restart the conversation.\n\nOur privacy policy:\n\n%s\n\nAccept? (Yes/No)' "$WELCOME_TITLE" "$PRIVACY_POLICY")
                         send_html_message "$chat_id" "$welcome_message"
                         set_state "$user_id" "state:await_policy"
                         ;;
@@ -421,7 +425,12 @@ while true; do
                 ;;
             admin:set_excluded)
                 text="$raw_text"
-                echo "$text" > excluded_countries.txt
+                text_lower="${text,,}"
+                if [ "$text_lower" = "none" ]; then
+                    echo "" > excluded_countries.txt
+                else
+                    echo "$text" > excluded_countries.txt
+                fi
                 send_message "$chat_id" "Excluded countries updated."
                 send_admin_menu "$chat_id" "$user_id"
                 ;;
