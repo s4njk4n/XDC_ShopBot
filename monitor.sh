@@ -56,7 +56,7 @@ while true; do
         start_block=$(($last_block_num + 1))
     fi
 
-    # Check all pending for timeouts
+    # Check all pending for timeouts (useful for timely cleanup even without new blocks)
     for pending_file in "$PENDING_DIR"/*.pending; do
         [ ! -f "$pending_file" ] && continue
 
@@ -105,48 +105,43 @@ while true; do
 
             log_event "Found tx $tx_hash to $to with value $value_dec"
 
-            matched=0
             for pending_file in "$PENDING_DIR"/*.pending; do
                 [ ! -f "$pending_file" ] && continue
 
-                (
-                flock -x 200
-                expected_wei=$(grep '^expected_wei:' "$pending_file" | cut -d: -f2)
-                timeout=$(grep '^timeout:' "$pending_file" | cut -d: -f2)
-                item_id=$(grep '^item_id:' "$pending_file" | cut -d: -f2)
-                user_id=$(basename "$pending_file" .pending)
+                result=$(
+                    flock -x 200
+                    expected_wei=$(grep '^expected_wei:' "$pending_file" | cut -d: -f2)
+                    timeout=$(grep '^timeout:' "$pending_file" | cut -d: -f2)
+                    item_id=$(grep '^item_id:' "$pending_file" | cut -d: -f2)
+                    user_id=$(basename "$pending_file" .pending)
 
-                log_event "Expected for $user_id: $expected_wei (item $item_id, timeout $timeout)"
+                    log_event "Expected for $user_id: $expected_wei (item $item_id, timeout $timeout)"
 
-                now=$(date +%s)
-                if [ $now -gt $timeout ]; then
-                    send_message "$user_id" "Payment timed out."
-                    rm "$pending_file"
-                    set_state "$user_id" "state:start"
-                    log_event "Timeout for $user_id"
-                    continue
-                fi
+                    now=$(date +%s)
+                    if [ $now -gt $timeout ]; then
+                        send_message "$user_id" "Payment timed out."
+                        rm "$pending_file"
+                        set_state "$user_id" "state:start"
+                        log_event "Timeout for $user_id"
+                        exit 0  # Exit subshell cleanly
+                    fi
 
-                if [ "$value_dec" = "$expected_wei" ]; then
-                    success_msg=$(cat "$MESSAGES_DIR/$item_id.txt")
-                    send_message "$user_id" "$success_msg"
-                    set_state "$user_id" "state:start"
+                    if [ "$value_dec" = "$expected_wei" ]; then
+                        success_msg=$(cat "$MESSAGES_DIR/$item_id.txt")
+                        send_message "$user_id" "$success_msg"
+                        set_state "$user_id" "state:start"
 
-                    echo "$(date '+%Y-%m-%d %H:%M:%S'),$user_id,$item_id,$(grep '^expected_amount:' "$pending_file" | cut -d: -f2),$tx_hash" >> "$SUCCESS_LOG"
+                        echo "$(date '+%Y-%m-%d %H:%M:%S'),$user_id,$item_id,$(grep '^expected_amount:' "$pending_file" | cut -d: -f2),$tx_hash" >> "$SUCCESS_LOG"
 
-                    rm "$pending_file"
-                    log_event "Success for $user_id: $tx_hash"
-                    echo "matched=1" > /tmp/matched_flag_$$
-                    exit 0
-                fi
+                        rm "$pending_file"
+                        log_event "Success for $user_id: $tx_hash"
+                        echo "matched"  # Signal match
+                        exit 0
+                    fi
                 ) 200>"$pending_file.lock"
 
-                if [ -f /tmp/matched_flag_$$ ]; then
-                    matched=$(cat /tmp/matched_flag_$$)
-                    rm /tmp/matched_flag_$$
-                    if [ "$matched" = "1" ]; then
-                        break
-                    fi
+                if [ "$result" = "matched" ]; then
+                    break  # Stop checking further pendings for this tx
                 fi
             done
         done
