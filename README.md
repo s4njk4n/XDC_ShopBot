@@ -13,7 +13,7 @@ The bot handles:
 - Guiding customers through purchase (including privacy policy acceptance and country checks if needed).
 - Generating unique payment amounts in XDC (or converted from USD).
 - Monitoring the XDC blockchain for incoming payments.
-- Automatically delivering a success message (e.g., an access code or digital product download links) to the customer after payment has been received at your address.
+- Automatically delivering an order fulfillment message (e.g., an access code or digital product download links) to the customer after payment has been received at your address.
 
 Everything runs on your own server (like a cheap VPS), and you control it all. No third-party services required beyond Telegram and a free XDC RPC endpoint.
 
@@ -122,7 +122,7 @@ To reset logs/states (if something goes wrong):
 5. See product list.
 6. Reply with product ID to buy.
 7. Send exact XDC amount to your address (bot gives instructions).
-8. After payment has been received, bot sends success message (e.g., access code or digital product download links).
+8. After payment has been received, bot sends order fulfillment message (e.g., access code or digital product download links).
 
 ### For You (Admin/Owner)
 Chat with your bot on Telegram. Only your User ID can use the special `/admin` command to open the Admin menu through which you can:
@@ -130,13 +130,13 @@ Chat with your bot on Telegram. Only your User ID can use the special `/admin` c
 1. List all items (shows IDs, names, prices, and success messages).
 2. Add an item (prompts for ID, name, currency (XDC/USD), price, and success message).
 3. Delete an item (by ID).
-4. Set new success message (for an existing item ID).
+4. Set new order fulfillment message (for an existing item ID).
 5. Set new welcome title.
 6. Set new privacy policy.
 7. Set excluded countries (comma-separated or "none").
 0. Exit admin menu.
 
-Products are stored in `items.csv` (but edit via commands to avoid mistakes). Success messages in `messages/` folder as `.txt` files.
+Products are stored in `items.csv` (but edit via commands to avoid mistakes). Order fulfillment messages in `messages/` folder as `.txt` files.
 
 Sales logged in `success_log.csv` for your records.
 
