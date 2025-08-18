@@ -1,4 +1,4 @@
-Experimental project released under MIT license. Feel free to build or improve further.
+Project in Beta. Released under MIT license. Feel free to build or improve further.
 
 # XDC_ShopBot
 
