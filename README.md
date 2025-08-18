@@ -1,12 +1,12 @@
 Project in Beta. Released under MIT license. Feel free to build or improve further.
 
-# XDC_ShopBot
+# XDC ShopBot
 
 ![XDC ShopBot Logo](XDC_ShopBot.jpg)
 
-## What is XDC_ShopBot?
+## What is XDC ShopBot?
 
-XDC_ShopBot is a simple, beginner-friendly Telegram bot that lets you sell digital products (like access codes, files, or services) and accept payments in XDC cryptocurrency. It's designed for hobbyists wanting to set up or play with an online shop without needing advanced coding skills. 
+XDC ShopBot is a simple, beginner-friendly Telegram bot that lets you sell digital products (like access codes, files, or services) and accept payments in XDC cryptocurrency. It's designed for hobbyists wanting to set up or play with an online shop without needing advanced coding skills. 
 
 The bot handles:
 - Showing a list of your products to customers.
