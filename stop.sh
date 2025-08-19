@@ -26,7 +26,7 @@ else
   echo ""
 fi
 
-# Optional: Keep the remaining processes check if desired
+# Remaining processes check
 echo "The only remaining processes are as follows (If all XDC ShopBot processes have been terminated it is normal to see 2 entries related to grep):"
 ps aux | grep bot.sh
 ps aux | grep monitor.sh
