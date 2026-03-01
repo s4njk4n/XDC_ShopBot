@@ -154,3 +154,104 @@ Sales logged in `success_log.csv` for your records.
 MIT License – free to use and modify.
 
 Happy selling with XDC! If you get stuck, ask in XDC communities (Or contact me thru [XDC Outpost](https://s4njk4n.github.io/XDCOutpost/)  ). 🚀
+
+## Addendum - Setting up as systemd service to survive reboots etc
+
+### Setup steps
+
+Step 1:
+```bash
+cd ~/XDC_ShopBot
+chmod +x bot.sh monitor.sh   # just in case
+```
+
+Step 2: Create the two service files
+
+```bash
+sudo tee /etc/systemd/system/xdc-shopbot-bot.service > /dev/null <<EOF
+[Unit]
+Description=XDC ShopBot - Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=$(whoami)
+WorkingDirectory=/home/$(whoami)/XDC_ShopBot
+ExecStart=/bin/bash -c 'exec ./bot.sh'
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+```bash
+sudo tee /etc/systemd/system/xdc-shopbot-monitor.service > /dev/null <<EOF
+[Unit]
+Description=XDC ShopBot - Payment Monitor
+After=network.target
+
+[Service]
+Type=simple
+User=$(whoami)
+WorkingDirectory=/home/$(whoami)/XDC_ShopBot
+ExecStart=/bin/bash -c 'exec ./monitor.sh'
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+Note: If you are running as root, you'll need to make one small modification by subsequently also running:
+
+```bash
+sudo sed -i 's|/home/root/XDC_ShopBot|/root/XDC_ShopBot|g' /etc/systemd/system/xdc-shopbot-*.service
+```
+The extra step just fixes the path as on Ubuntu, root isnt located in the home directory.
+
+3. Enable and start them
+
+```bash
+sudo systemctl daemon-reload
+
+sudo systemctl enable --now xdc-shopbot-bot.service
+sudo systemctl enable --now xdc-shopbot-monitor.service
+```
+
+4. Check everything is running
+
+```bash
+systemctl status xdc-shopbot-bot
+systemctl status xdc-shopbot-monitor
+```
+
+### Live logs
+
+```bash
+journalctl -u xdc-shopbot-bot -f
+journalctl -u xdc-shopbot-monitor -f
+```
+
+### How to stop / restart manually now (instead of using the start.sh and stop.sh scripts)
+
+```bash
+sudo systemctl stop xdc-shopbot-bot xdc-shopbot-monitor
+sudo systemctl restart xdc-shopbot-bot xdc-shopbot-monitor
+```
+./stop.sh and ./start.sh will still work but are no longer needed for normal operation if using this systemd method
+
+### Bonus: If you ever want to remove the systemd setup
+
+```bash
+sudo systemctl disable --now xdc-shopbot-bot xdc-shopbot-monitor
+sudo rm /etc/systemd/system/xdc-shopbot-*.service
+sudo systemctl daemon-reload
+```
+
