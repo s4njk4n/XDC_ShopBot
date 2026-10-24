@@ -66,7 +66,7 @@ SELLER_ADDRESS="$SELLER_ADDRESS"
 OWNER_ID="$OWNER_ID"
 
 # RPC URL for XDC network (use a public one or your own node)
-RPC_URL="https://rpc.ankr.com/xdc"
+RPC_URL="https://rpc.plugin.global/xdcmainnet"
 
 # Items CSV path
 ITEMS_CSV="items.csv"
